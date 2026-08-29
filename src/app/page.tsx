@@ -86,7 +86,7 @@ export default function LoginPage() {
 
         <div className="relative z-10 max-w-lg">
           <h1 className="text-[38px] font-bold leading-[1.2]">
-            منصة رصد تنفيذ استراتيجية التحول الرقمي
+            نظام إدارة استراتيجية التحول الرقمي
           </h1>
           <p className="mt-5 text-[15px] leading-[1.85] text-white/75">
             كثير من الجهات الحكومية تملك استراتيجية تحول رقمي متكاملة دون أداة تربط المبادرات
@@ -118,7 +118,7 @@ export default function LoginPage() {
         <div className="lg:hidden mb-8 flex items-center gap-3">
           <Image src="/brand/dga-emblem.png" alt="" width={40} height={40} />
           <div>
-            <p className="text-[15px] font-bold text-ink leading-tight">منصة رصد تنفيذ الاستراتيجية</p>
+            <p className="text-[15px] font-bold text-ink leading-tight">نظام إدارة استراتيجية التحول الرقمي</p>
             <p className="text-[12px] text-n500">{data.settings.entityName}</p>
           </div>
         </div>

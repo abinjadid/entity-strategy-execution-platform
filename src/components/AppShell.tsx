@@ -162,8 +162,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               className="shrink-0 object-contain"
             />
             <span className="min-w-0">
-              <span className="block text-[13.5px] font-bold text-ink leading-tight">
-                منصة رصد التنفيذ
+              <span className="block text-[12.5px] font-bold text-ink leading-snug">
+                نظام إدارة استراتيجية التحول الرقمي
               </span>
               <span className="block text-[11.5px] text-n500 truncate">
                 {data.settings.entityName}
@@ -183,7 +183,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="flex items-center justify-between px-4 py-4 border-b border-n100">
               <span className="flex items-center gap-2.5">
                 <Image src="/brand/dga-emblem.png" alt="" width={30} height={30} />
-                <span className="text-[13.5px] font-bold">منصة رصد التنفيذ</span>
+                <span className="text-[12.5px] font-bold leading-snug">نظام إدارة استراتيجية التحول الرقمي</span>
               </span>
               <button onClick={() => setOpen(false)} aria-label="إغلاق" className="p-1.5 rounded-lg hover:bg-n100">
                 <X size={18} />
@@ -240,7 +240,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <footer className="no-print px-6 py-4 border-t border-n200 bg-white">
           <p className="text-[11.5px] text-n500 text-center leading-relaxed">
-            منصة رصد تنفيذ استراتيجية التحول الرقمي · مبنية على هوية الهيئة الرقمية وكود المنصات
+            نظام إدارة استراتيجية التحول الرقمي · مبنية على هوية الهيئة الرقمية وكود المنصات
             السعودي · البيانات المعروضة تجريبية لأغراض العرض
           </p>
         </footer>

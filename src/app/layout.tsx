@@ -2,10 +2,10 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "منصة رصد تنفيذ استراتيجية التحول الرقمي",
+  title: "نظام إدارة استراتيجية التحول الرقمي",
   description:
     "منصة تربط الركائز والأهداف بالمبادرات والمشاريع ومؤشرات الأداء، وتتابع تنفيذ استراتيجية التحول الرقمي لحظة بلحظة.",
-  applicationName: "منصة رصد تنفيذ الاستراتيجية",
+  applicationName: "نظام إدارة استراتيجية التحول الرقمي",
   icons: { icon: "/brand/dga-emblem.png" },
 };
 

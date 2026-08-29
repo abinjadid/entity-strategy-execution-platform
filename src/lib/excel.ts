@@ -32,7 +32,7 @@ const LIGHT = "FFF2F1F6";
 async function newWorkbook(): Promise<Workbook> {
   const ExcelJS = (await import("exceljs")).default;
   const wb = new ExcelJS.Workbook();
-  wb.creator = "منصة رصد تنفيذ استراتيجية التحول الرقمي";
+  wb.creator = "نظام إدارة استراتيجية التحول الرقمي";
   wb.created = new Date();
   return wb;
 }

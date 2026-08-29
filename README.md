@@ -1,4 +1,4 @@
-# منصة رصد تنفيذ استراتيجية التحول الرقمي
+# نظام إدارة استراتيجية التحول الرقمي
 
 **Digital Transformation Strategy Execution Platform**
 
