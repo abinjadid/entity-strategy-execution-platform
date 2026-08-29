@@ -1,0 +1,240 @@
+@import "tailwindcss";
+
+/* =========================================================================
+   Diodrum Arabic — DGA primary typeface (Medium 500 / Semibold 600 / Bold 700)
+   Regular / Light / Extra Light were not supplied; body copy floors at Medium.
+   ========================================================================= */
+@font-face {
+  font-family: "Diodrum Arabic";
+  src: url("/fonts/DiodrumArabic-Medium.woff2") format("woff2");
+  font-weight: 400 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Diodrum Arabic";
+  src: url("/fonts/DiodrumArabic-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Diodrum Arabic";
+  src: url("/fonts/DiodrumArabic-Bold.woff2") format("woff2");
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* =========================================================================
+   DGA design tokens — Brand Identity Guideline v03 (pp. 20–25)
+   ========================================================================= */
+@theme {
+  --font-sans: "Diodrum Arabic", "IBM Plex Sans Arabic", "Segoe UI", system-ui, sans-serif;
+
+  /* Primary brand colors */
+  --color-dga-green: #1cc182;
+  --color-dga-blue: #1d9af2;
+  --color-dga-navy: #2a206a;
+  --color-dga-purple: #852cd0;
+
+  /* Secondary support colors */
+  --color-dga-indigo: #594aff;
+  --color-dga-slate: #5d6167;
+  --color-dga-teal: #00abaf;
+  --color-dga-yellow: #ffe257;
+  --color-dga-orange: #ffa300;
+  --color-dga-orange-deep: #ff6700;
+  --color-dga-red: #c40000;
+
+  /* Tint ramps */
+  --color-dga-green-100: #c7f9e8;
+  --color-dga-green-200: #3ceebc;
+  --color-dga-green-300: #00e28e;
+  --color-dga-green-400: #008756;
+  --color-dga-blue-100: #cceaff;
+  --color-dga-blue-200: #3bc2ff;
+  --color-dga-blue-300: #0097ff;
+  --color-dga-blue-400: #005c9d;
+  --color-dga-purple-100: #e7d4f7;
+  --color-dga-purple-200: #b981e6;
+  --color-dga-purple-300: #872dd3;
+  --color-dga-purple-400: #531a80;
+  --color-dga-indigo-100: #dcd7f4;
+  --color-dga-indigo-200: #9787e1;
+  --color-dga-indigo-300: #523acb;
+  --color-dga-indigo-400: #1c1554;
+
+  /* Neutrals */
+  --color-ink: #1a1730;
+  --color-n900: #26232f;
+  --color-n700: #4a4757;
+  --color-n500: #767286;
+  --color-n300: #c3c1cc;
+  --color-n200: #e2e0e8;
+  --color-n100: #f2f1f6;
+  --color-n50: #f8f8fb;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --shadow-card: 0 1px 2px rgba(26, 23, 48, 0.06);
+  --shadow-raise: 0 4px 12px rgba(26, 23, 48, 0.08);
+  --shadow-pop: 0 12px 32px rgba(26, 23, 48, 0.12);
+}
+
+:root {
+  --gradient-brand: linear-gradient(180deg, #00abaf 0%, #0093b4 24%, #0080ba 48%, #774896 100%);
+  --gradient-brand-h: linear-gradient(90deg, #00abaf 0%, #1d9af2 45%, #852cd0 100%);
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: var(--color-n50);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Arabic-Indic-free numerals: keep Western digits for data legibility */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Scrollbars — understated, matches the brand's calm tone */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-n300);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-n500);
+  background-clip: content-box;
+  border: 3px solid transparent;
+}
+
+/* Focus ring — 2px brand navy per design-system rules */
+:focus-visible {
+  outline: 2px solid var(--color-dga-navy);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Range slider — used for project progress entry */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-n200);
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--color-dga-navy);
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(26, 23, 48, 0.25);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--color-dga-navy);
+  cursor: pointer;
+}
+
+/* Recharts is LTR-internally; keep its tooltips readable in RTL */
+.recharts-default-tooltip {
+  direction: rtl;
+  text-align: right;
+  border-radius: 10px !important;
+  border: 1px solid var(--color-n200) !important;
+  box-shadow: 0 4px 12px rgba(26, 23, 48, 0.08);
+  font-family: var(--font-sans);
+}
+.recharts-wrapper,
+.recharts-surface {
+  direction: ltr;
+}
+
+@keyframes dga-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-in {
+  animation: dga-fade-in 200ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* ============================ Print / PDF export ========================= */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm 12mm;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  .no-print,
+  aside,
+  nav.app-nav,
+  header.app-header {
+    display: none !important;
+  }
+  .print-area {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+  .print-block {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .print-page-break {
+    break-before: page;
+    page-break-before: always;
+  }
+  .shadow-card,
+  .shadow-raise,
+  .shadow-pop {
+    box-shadow: none !important;
+  }
+  .print-border {
+    border: 1px solid #d6d4de !important;
+  }
+  .print-area table {
+    min-width: 0 !important;
+    font-size: 10.5px;
+  }
+  .print-area .overflow-x-auto {
+    overflow: visible !important;
+  }
+}
