@@ -121,16 +121,16 @@ export function FilterBar({
   return (
     <div
       className={clsx(
-        "bg-white border border-n200 rounded-[16px] shadow-card no-print",
+        "bg-surface border border-n200 rounded-[16px] shadow-card no-print",
         className,
       )}
     >
       <div className="flex items-center gap-3 px-4 py-3">
         <span className="flex items-center gap-2 text-[13px] font-bold text-ink shrink-0">
-          <Filter size={16} className="text-dga-navy" />
+          <Filter size={16} className="text-brand-text" />
           الفلاتر
           {activeCount > 0 ? (
-            <span className="min-w-[20px] h-5 px-1.5 grid place-items-center rounded-full bg-dga-navy text-white text-[11px] font-bold tnum">
+            <span className="min-w-[20px] h-5 px-1.5 grid place-items-center rounded-full bg-brand-solid text-white text-[11px] font-bold tnum">
               {activeCount}
             </span>
           ) : null}
@@ -142,7 +142,7 @@ export function FilterBar({
             value={filters.search}
             onChange={(e) => setFilter("search", e.target.value)}
             placeholder="بحث بالاسم أو الرمز…"
-            className="w-full h-9 rounded-[10px] border border-n300 bg-white ps-9 pe-3 text-[13px] outline-none focus:border-dga-navy transition-colors placeholder:text-n300"
+            className="w-full h-9 rounded-[10px] border border-n300 bg-surface ps-9 pe-3 text-[13px] outline-none focus:border-brand-text transition-colors placeholder:text-n300"
           />
           {filters.search ? (
             <button
@@ -158,7 +158,7 @@ export function FilterBar({
         {compact ? (
           <button
             onClick={() => setExpanded((v) => !v)}
-            className="text-[12.5px] font-semibold text-dga-navy hover:underline shrink-0"
+            className="text-[12.5px] font-semibold text-brand-text hover:underline shrink-0"
           >
             {expanded ? "إخفاء الفلاتر" : "عرض كل الفلاتر"}
           </button>

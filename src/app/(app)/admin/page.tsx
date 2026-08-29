@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
   Check,
@@ -12,7 +13,9 @@ import {
   Save,
   Settings2,
   ShieldCheck,
+  Sparkles,
   Trash2,
+  ImagePlus,
   Upload,
   UserCog,
   X,
@@ -45,6 +48,7 @@ import type { Role, User } from "@/lib/types";
 import { downloadImportTemplate, exportFullXlsx, importFromExcel } from "@/lib/excel";
 import type { ImportResult } from "@/lib/excel";
 import { initials, num } from "@/lib/format";
+import { BrandMark } from "@/components/BrandMark";
 
 const PERMISSION_LABELS: Record<Permission, string> = {
   "structure.manage": "إدارة الهيكل الاستراتيجي",
@@ -68,6 +72,7 @@ const ALL_PERMISSIONS = Object.keys(PERMISSION_LABELS) as Permission[];
 const ROLES: Role[] = ["admin", "pmo", "owner", "viewer"];
 
 export default function AdminPage() {
+  const router = useRouter();
   const data = useStore((s) => s.data);
   const currentUserId = useStore((s) => s.currentUserId);
   const upsertUser = useStore((s) => s.upsertUser);
@@ -86,6 +91,7 @@ export default function AdminPage() {
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState<ImportResult | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const logoRef = useRef<HTMLInputElement>(null);
 
   const [settings, setSettings] = useState({
     entityName: data.settings.entityName,
@@ -96,6 +102,7 @@ export default function AdminPage() {
     currentQuarter: String(data.settings.currentQuarter),
     ragGreen: String(data.settings.ragGreen),
     ragAmber: String(data.settings.ragAmber),
+    logoDataUrl: data.settings.logoDataUrl,
   });
 
   const counts = useMemo(
@@ -163,8 +170,42 @@ export default function AdminPage() {
       currentQuarter: Number(settings.currentQuarter) as 1 | 2 | 3 | 4,
       ragGreen: Number(settings.ragGreen),
       ragAmber: Number(settings.ragAmber),
+      logoDataUrl: settings.logoDataUrl,
     });
     setToast("تم حفظ إعدادات المنصة");
+  };
+
+  const onLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    e.target.value = "";
+    if (!f) return;
+    if (!f.type.startsWith("image/") || f.size > 3 * 1024 * 1024) {
+      setToast("الشعار يجب أن يكون صورة بحجم لا يتجاوز 3 ميجابايت");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const src = String(reader.result);
+      const img = new window.Image();
+      img.onerror = () => setSettings((v) => ({ ...v, logoDataUrl: src }));
+      img.onload = () => {
+        const scale = Math.min(1, 320 / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return setSettings((v) => ({ ...v, logoDataUrl: src }));
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        setSettings((v) => ({ ...v, logoDataUrl: canvas.toDataURL("image/png") }));
+      };
+      img.src = src;
+    };
+    reader.readAsDataURL(f);
+  };
+
+  const rerunWizard = () => {
+    updateSettings({ onboarded: false });
+    router.push("/setup");
   };
 
   const onImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -259,7 +300,7 @@ export default function AdminPage() {
                   <tr key={u.id} className="hover:bg-n50 transition-colors">
                     <Td>
                       <span className="flex items-center gap-3">
-                        <span className="w-9 h-9 shrink-0 rounded-full bg-dga-navy text-white grid place-items-center text-[12px] font-bold">
+                        <span className="w-9 h-9 shrink-0 rounded-full bg-brand-solid text-white grid place-items-center text-[12px] font-bold">
                           {initials(u.name)}
                         </span>
                         <span className="min-w-0">
@@ -382,6 +423,50 @@ export default function AdminPage() {
                   onChange={(e) => setSettings({ ...settings, entityName: e.target.value })}
                 />
               </Field>
+
+              <div className="md:col-span-2">
+                <span className="block text-[13px] font-semibold text-n700 mb-2">شعار الجهة</span>
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="w-20 h-20 rounded-[12px] border border-n200 bg-n50 grid place-items-center overflow-hidden shrink-0">
+                    {settings.logoDataUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={settings.logoDataUrl}
+                        alt="شعار الجهة"
+                        className="max-w-[80%] max-h-[80%] object-contain"
+                      />
+                    ) : (
+                      <BrandMark size={40} />
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      ref={logoRef}
+                      type="file"
+                      accept="image/png,image/svg+xml,image/jpeg,image/webp"
+                      className="hidden"
+                      onChange={onLogo}
+                    />
+                    <Button onClick={() => logoRef.current?.click()}>
+                      <ImagePlus size={15} />
+                      {settings.logoDataUrl ? "استبدال" : "رفع شعار"}
+                    </Button>
+                    {settings.logoDataUrl ? (
+                      <Button
+                        variant="ghost"
+                        onClick={() => setSettings({ ...settings, logoDataUrl: "" })}
+                      >
+                        <Trash2 size={15} />
+                        إزالة
+                      </Button>
+                    ) : null}
+                  </div>
+                  <p className="text-[11.5px] text-n500 leading-relaxed max-w-xs">
+                    يظهر في القائمة الجانبية وشاشة الدخول وترويسة التقارير. اضغط «حفظ الإعدادات»
+                    بعد الرفع.
+                  </p>
+                </div>
+              </div>
               <Field label="اسم الاستراتيجية" className="md:col-span-2">
                 <Input
                   value={settings.strategyName}
@@ -431,11 +516,19 @@ export default function AdminPage() {
                 />
               </Field>
             </div>
-            <div className="mt-6 pt-5 border-t border-n100">
+            <div className="mt-6 pt-5 border-t border-n100 flex flex-wrap items-center gap-3">
               <Button variant="primary" onClick={saveSettings}>
                 <Save size={16} />
                 حفظ الإعدادات
               </Button>
+              <Button onClick={rerunWizard}>
+                <Sparkles size={16} />
+                إعادة تشغيل معالج الإعداد
+              </Button>
+              <p className="text-[11.5px] text-n500 leading-relaxed">
+                يعيد المعالج جمع هوية الجهة والاستراتيجية من البداية، ويتيح اختيار نقطة بداية
+                جديدة للبيانات.
+              </p>
             </div>
           </div>
         ) : null}
@@ -514,7 +607,7 @@ export default function AdminPage() {
                   </div>
                   {result.errors.length ? (
                     <div className="rounded-[10px] border border-dga-orange/35 bg-dga-orange/5 p-4">
-                      <p className="flex items-center gap-2 text-[12.5px] font-bold text-[#8a5a00] mb-2">
+                      <p className="flex items-center gap-2 text-[12.5px] font-bold text-warn-text mb-2">
                         <AlertTriangle size={15} />
                         {result.errors.length} صفاً تم تخطيه
                       </p>

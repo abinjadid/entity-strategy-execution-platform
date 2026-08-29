@@ -10,6 +10,7 @@ import clsx from "clsx";
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 
+import { useAccent } from "@/components/ThemeProvider";
 import { RAG_BG } from "@/lib/calc";
 import { PRIORITY_LABELS, STATUS_LABELS } from "@/lib/types";
 import type { Priority, Rag, Status } from "@/lib/types";
@@ -28,7 +29,7 @@ export function Card({
   return (
     <As
       className={clsx(
-        "bg-white border border-n200 rounded-[16px] shadow-card print-block",
+        "bg-surface border border-n200 rounded-[16px] shadow-card print-block",
         className,
       )}
     >
@@ -59,7 +60,7 @@ export function CardHead({
     >
       <div className="flex items-start gap-3 min-w-0">
         {icon ? (
-          <span className="shrink-0 mt-0.5 w-9 h-9 rounded-[10px] bg-n100 text-dga-navy grid place-items-center">
+          <span className="shrink-0 mt-0.5 w-9 h-9 rounded-[10px] bg-n100 text-brand-text grid place-items-center">
             {icon}
           </span>
         ) : null}
@@ -78,8 +79,8 @@ export function CardHead({
 type BtnVariant = "primary" | "secondary" | "ghost" | "danger" | "subtle";
 
 const BTN: Record<BtnVariant, string> = {
-  primary: "bg-dga-navy text-white hover:bg-[#221a57] active:bg-[#1c1549] border-transparent",
-  secondary: "bg-white text-dga-navy border-n300 hover:bg-n50 active:bg-n100",
+  primary: "bg-brand-solid text-white hover:brightness-110 active:brightness-95 border-transparent",
+  secondary: "bg-surface text-brand-text border-n300 hover:bg-n50 active:bg-n100",
   ghost: "bg-transparent text-n700 border-transparent hover:bg-n100",
   danger: "bg-dga-red text-white hover:bg-[#a80000] border-transparent",
   subtle: "bg-n100 text-ink border-transparent hover:bg-n200",
@@ -152,7 +153,7 @@ const STATUS_STYLE: Record<Status, string> = {
   not_started: "bg-n100 text-n700 border-n200",
   in_progress: "bg-dga-blue/10 text-dga-blue-400 border-dga-blue/25",
   completed: "bg-dga-green/12 text-dga-green-400 border-dga-green/30",
-  on_hold: "bg-dga-orange/12 text-[#8a5a00] border-dga-orange/35",
+  on_hold: "bg-dga-orange/12 text-warn-text border-dga-orange/35",
   cancelled: "bg-n100 text-n500 border-n200",
   delayed: "bg-dga-red/10 text-dga-red border-dga-red/30",
 };
@@ -199,6 +200,7 @@ export function Chip({
   color?: string;
   className?: string;
 }) {
+  const accent = useAccent();
   return (
     <span
       className={clsx(
@@ -206,7 +208,7 @@ export function Chip({
         className,
       )}
     >
-      {color ? <span className="w-2 h-2 rounded-full" style={{ background: color }} /> : null}
+      {color ? <span className="w-2 h-2 rounded-full" style={{ background: accent(color) }} /> : null}
       {children}
     </span>
   );
@@ -227,16 +229,17 @@ export function ProgressBar({
   height?: number;
   showPlanned?: boolean;
 }) {
+  const accent = useAccent();
   const v = Math.max(0, Math.min(100, value));
   return (
     <div className="relative w-full rounded-full bg-n200 overflow-hidden" style={{ height }}>
       <div
         className="h-full rounded-full transition-[width] duration-300"
-        style={{ width: `${v}%`, background: color }}
+        style={{ width: `${v}%`, background: accent(color) }}
       />
       {showPlanned && planned !== undefined ? (
         <span
-          className="absolute top-0 bottom-0 w-[2px] bg-ink/45"
+          className="absolute top-0 bottom-0 w-[2px] bg-[var(--scrim)]"
           style={{ right: `${Math.max(0, Math.min(100, planned))}%` }}
           title={`المخطط ${Math.round(planned)}%`}
         />
@@ -279,7 +282,7 @@ export function Field({
 }
 
 const INPUT_BASE =
-  "w-full h-10 rounded-[10px] border border-n300 bg-white px-3 text-[13.5px] text-ink placeholder:text-n300 outline-none transition-colors focus:border-dga-navy disabled:bg-n100 disabled:text-n500";
+  "w-full h-10 rounded-[10px] border border-n300 bg-surface px-3 text-[13.5px] text-ink placeholder:text-n300 outline-none transition-colors focus:border-brand-text disabled:bg-n100 disabled:text-n500";
 
 export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={clsx(INPUT_BASE, props.className)} />;
@@ -322,7 +325,7 @@ export function Select({
         disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
         className={clsx(
-          "w-full rounded-[10px] border border-n300 bg-white pe-3 ps-8 text-ink outline-none transition-colors focus:border-dga-navy appearance-none disabled:bg-n100 disabled:text-n500",
+          "w-full rounded-[10px] border border-n300 bg-surface pe-3 ps-8 text-ink outline-none transition-colors focus:border-brand-text appearance-none disabled:bg-n100 disabled:text-n500",
           size === "sm" ? "h-9 text-[12.5px]" : "h-10 text-[13.5px]",
         )}
       >
@@ -385,12 +388,12 @@ export function Modal({
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:p-8 no-print">
-      <div className="fixed inset-0 bg-ink/45" onClick={onClose} aria-hidden />
+      <div className="fixed inset-0 bg-[var(--scrim)]" onClick={onClose} aria-hidden />
       <div
         role="dialog"
         aria-modal="true"
         className={clsx(
-          "relative w-full bg-white rounded-[16px] shadow-pop border border-n200 animate-in my-auto",
+          "relative w-full bg-surface rounded-[16px] shadow-pop border border-n200 animate-in my-auto",
           width,
         )}
       >
@@ -458,6 +461,7 @@ export function StatCard({
   accent?: string;
   trend?: { value: number; label?: string };
 }) {
+  const a = useAccent()(accent) ?? accent;
   return (
     <Card className="p-4 flex flex-col gap-3">
       <div className="flex items-start justify-between gap-3">
@@ -465,7 +469,7 @@ export function StatCard({
         {icon ? (
           <span
             className="shrink-0 w-8 h-8 rounded-[9px] grid place-items-center"
-            style={{ background: `${accent}14`, color: accent }}
+            style={{ background: `${a}1f`, color: a }}
           >
             {icon}
           </span>
@@ -557,7 +561,7 @@ export function Tabs({
           onClick={() => onChange(t.id)}
           className={clsx(
             "relative px-4 py-2.5 text-[13.5px] font-semibold whitespace-nowrap transition-colors",
-            active === t.id ? "text-dga-navy" : "text-n500 hover:text-n700",
+            active === t.id ? "text-brand-text" : "text-n500 hover:text-n700",
           )}
         >
           {t.label}
@@ -565,7 +569,7 @@ export function Tabs({
             <span className="ms-1.5 text-[11.5px] text-n500 tnum">({t.count})</span>
           ) : null}
           {active === t.id ? (
-            <span className="absolute inset-x-2 -bottom-px h-[2.5px] rounded-full bg-dga-navy" />
+            <span className="absolute inset-x-2 -bottom-px h-[2.5px] rounded-full bg-brand-solid" />
           ) : null}
         </button>
       ))}
@@ -593,7 +597,7 @@ export function Toast({
     <div className="fixed bottom-6 start-6 z-[60] no-print animate-in">
       <div
         className={clsx(
-          "flex items-center gap-3 rounded-[12px] border px-4 py-3 shadow-pop bg-white max-w-md",
+          "flex items-center gap-3 rounded-[12px] border px-4 py-3 shadow-pop bg-surface max-w-md",
           kind === "success" && "border-dga-green/40",
           kind === "error" && "border-dga-red/40",
           kind === "info" && "border-n200",

@@ -216,7 +216,7 @@ export default function BudgetPage() {
                 <Td className="text-[12.5px] font-bold tnum">{pct(p.progress)}</Td>
                 <Td>
                   <span
-                    className={`text-[12.5px] font-bold tnum ${p.efficiency >= 1 ? "text-dga-green-400" : p.efficiency >= 0.85 ? "text-[#8a5a00]" : "text-dga-red"}`}
+                    className={`text-[12.5px] font-bold tnum ${p.efficiency >= 1 ? "text-dga-green-400" : p.efficiency >= 0.85 ? "text-warn-text" : "text-dga-red"}`}
                   >
                     {p.efficiency.toFixed(2)}
                   </span>
@@ -250,7 +250,7 @@ export default function BudgetPage() {
               <tr key={i.id} className="hover:bg-n50 transition-colors">
                 <Td>
                   <Link href={`/initiatives/${i.id}`} className="group">
-                    <span className="block text-[13px] font-bold text-ink group-hover:text-dga-navy transition-colors">
+                    <span className="block text-[13px] font-bold text-ink group-hover:text-brand-text transition-colors">
                       {i.name}
                     </span>
                     <span className="block text-[11.5px] text-n500 mt-0.5 tnum">{i.code}</span>
@@ -270,7 +270,7 @@ export default function BudgetPage() {
                 <Td className="text-[12.5px] font-bold tnum">{pct(progress)}</Td>
                 <Td>
                   <span
-                    className={`text-[12.5px] font-bold tnum ${efficiency >= 1 ? "text-dga-green-400" : efficiency >= 0.85 ? "text-[#8a5a00]" : "text-dga-red"}`}
+                    className={`text-[12.5px] font-bold tnum ${efficiency >= 1 ? "text-dga-green-400" : efficiency >= 0.85 ? "text-warn-text" : "text-dga-red"}`}
                   >
                     {efficiency.toFixed(2)}
                   </span>

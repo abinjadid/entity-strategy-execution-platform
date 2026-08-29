@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useMemo, useState } from "react";
 import { FileBarChart, FileSpreadsheet, Printer } from "lucide-react";
 
 import { ActiveFilterSummary, FilterBar } from "@/components/FilterBar";
+import { BrandMark } from "@/components/BrandMark";
 import { ActualVsPlannedBar, MaturityRadar, TrendChart } from "@/components/charts";
 import {
   Button,
@@ -187,7 +187,7 @@ export default function ReportsPage() {
       <Card className="mb-5 print-border">
         <div className="flex flex-wrap items-start justify-between gap-5 p-6 border-b border-n100">
           <div className="flex items-start gap-4">
-            <Image src="/brand/dga-emblem.png" alt="" width={52} height={52} className="object-contain" />
+            <BrandMark size={52} />
             <div>
               <p className="text-[12px] text-n500">{data.settings.entityName}</p>
               <h2 className="text-[20px] font-bold text-ink mt-1">{KIND_LABELS[kind]}</h2>

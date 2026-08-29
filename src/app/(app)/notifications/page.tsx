@@ -134,7 +134,7 @@ export default function NotificationsPage() {
                       {by ? initials(by.name) : "—"}
                     </span>
                     <span
-                      className="absolute -bottom-0.5 -start-0.5 w-3.5 h-3.5 rounded-full border-2 border-white"
+                      className="absolute -bottom-0.5 -start-0.5 w-3.5 h-3.5 rounded-full border-2 border-surface"
                       style={{ background: SEVERITY_COLOR[n.severity] }}
                     />
                   </span>
@@ -155,7 +155,7 @@ export default function NotificationsPage() {
                       <span className="tnum">{dateTimeAr(n.at)}</span>
                       <span>{timeAgo(n.at)}</span>
                       {href ? (
-                        <Link href={href} className="font-semibold text-dga-navy hover:underline no-print">
+                        <Link href={href} className="font-semibold text-brand-text hover:underline no-print">
                           فتح السجل
                         </Link>
                       ) : null}

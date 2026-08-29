@@ -109,7 +109,7 @@ export default function KpiDetail() {
         {persp ? <Chip>منظور قياس: {persp.code} · {persp.name}</Chip> : null}
         {init ? (
           <Link href={`/initiatives/${init.id}`}>
-            <Chip className="hover:border-dga-navy">{init.code} · {init.name}</Chip>
+            <Chip className="hover:border-brand-text">{init.code} · {init.name}</Chip>
           </Link>
         ) : null}
         <Chip>{FREQUENCY_LABELS[kpi.frequency]}</Chip>

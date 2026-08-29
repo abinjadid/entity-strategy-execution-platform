@@ -291,7 +291,11 @@ export interface AppNotification {
 
 /** إعدادات المنصة */
 export interface Settings {
+  /** هل أُكملت التهيئة الأولى؟ يُعرض معالج الإعداد عندما تكون false */
+  onboarded: boolean;
   entityName: string;
+  /** شعار الجهة كـ data URL — يحل محل شعار الهيئة في كل الواجهات */
+  logoDataUrl: string;
   strategyName: string;
   strategyStartYear: number;
   strategyEndYear: number;

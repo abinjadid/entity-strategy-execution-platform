@@ -357,7 +357,7 @@ export default function ProjectDetail() {
           <ul className="divide-y divide-n100">
             {attachments.map((a) => (
               <li key={a.id} className="flex items-center gap-3 px-5 py-3.5">
-                <span className="w-9 h-9 shrink-0 rounded-[9px] bg-n100 grid place-items-center text-dga-navy">
+                <span className="w-9 h-9 shrink-0 rounded-[9px] bg-n100 grid place-items-center text-brand-text">
                   <FileText size={17} />
                 </span>
                 <span className="min-w-0 flex-1">
@@ -370,7 +370,7 @@ export default function ProjectDetail() {
                 <a
                   href={a.dataUrl}
                   download={a.name}
-                  className="shrink-0 p-2 rounded-[8px] text-n500 hover:bg-n100 hover:text-dga-navy transition-colors no-print"
+                  className="shrink-0 p-2 rounded-[8px] text-n500 hover:bg-n100 hover:text-brand-text transition-colors no-print"
                   title="تنزيل"
                 >
                   <Download size={16} />

@@ -63,7 +63,7 @@ export function ProgressUpdateModal({
           <div>
             <div className="flex items-end justify-between mb-4">
               <span className="text-[13px] font-semibold text-n700">نسبة الإنجاز الفعلية</span>
-              <span className="text-[34px] font-bold text-dga-navy leading-none tnum">{Math.round(value)}%</span>
+              <span className="text-[34px] font-bold text-brand-text leading-none tnum">{Math.round(value)}%</span>
             </div>
 
             <input
@@ -81,7 +81,7 @@ export function ProgressUpdateModal({
                 <button
                   key={n}
                   onClick={() => setValue(n)}
-                  className="hover:text-dga-navy font-semibold transition-colors"
+                  className="hover:text-brand-text font-semibold transition-colors"
                 >
                   {n}%
                 </button>

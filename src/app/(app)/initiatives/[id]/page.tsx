@@ -219,7 +219,7 @@ export default function InitiativeDetail() {
                   <tr key={p.id} className="hover:bg-n50 transition-colors">
                     <Td>
                       <Link href={`/projects/${p.id}`} className="group">
-                        <span className="block text-[13px] font-bold text-ink group-hover:text-dga-navy transition-colors">
+                        <span className="block text-[13px] font-bold text-ink group-hover:text-brand-text transition-colors">
                           {p.name}
                         </span>
                         <span className="block text-[11.5px] text-n500 mt-0.5 tnum">
@@ -292,7 +292,7 @@ export default function InitiativeDetail() {
                   <tr key={k.id} className="hover:bg-n50 transition-colors">
                     <Td>
                       <Link href={`/kpis/${k.id}`} className="group">
-                        <span className="block text-[13px] font-bold text-ink group-hover:text-dga-navy transition-colors">
+                        <span className="block text-[13px] font-bold text-ink group-hover:text-brand-text transition-colors">
                           {k.name}
                         </span>
                         <span className="block text-[11.5px] text-n500 mt-0.5 tnum">{k.code}</span>

@@ -270,7 +270,7 @@ export default function QiyasPage() {
                       <Link
                         key={k.id}
                         href={`/kpis/${k.id}`}
-                        className="flex items-center gap-2.5 rounded-[10px] border border-n200 p-3 hover:border-dga-navy transition-colors"
+                        className="flex items-center gap-2.5 rounded-[10px] border border-n200 p-3 hover:border-brand-text transition-colors"
                       >
                         <span className="min-w-0 flex-1">
                           <span className="block text-[12.5px] font-semibold text-ink truncate">{k.name}</span>

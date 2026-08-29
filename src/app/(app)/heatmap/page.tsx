@@ -174,7 +174,7 @@ export default function HeatmapPage() {
             <table className="w-full min-w-[820px] border-separate border-spacing-0">
               <thead>
                 <tr>
-                  <th className="text-start text-[11.5px] font-bold text-n500 px-3 py-2 sticky start-0 bg-white z-10 w-[300px]">
+                  <th className="text-start text-[11.5px] font-bold text-n500 px-3 py-2 sticky start-0 bg-surface z-10 w-[300px]">
                     المؤشر
                   </th>
                   {quarters.map((q) => (
@@ -217,9 +217,9 @@ export default function HeatmapPage() {
                       const lastA = achievement(k, lastR ?? null);
                       return (
                         <tr key={k.id} className="group">
-                          <td className="px-3 py-1.5 sticky start-0 bg-white group-hover:bg-n50 z-10 border-b border-n100">
+                          <td className="px-3 py-1.5 sticky start-0 bg-surface group-hover:bg-n50 z-10 border-b border-n100">
                             <Link href={`/kpis/${k.id}`} className="block">
-                              <span className="block text-[12.5px] font-semibold text-ink truncate max-w-[280px] group-hover:text-dga-navy transition-colors">
+                              <span className="block text-[12.5px] font-semibold text-ink truncate max-w-[280px] group-hover:text-brand-text transition-colors">
                                 {k.name}
                               </span>
                               <span className="block text-[10.5px] text-n500 tnum">{k.code}</span>
@@ -237,9 +237,9 @@ export default function HeatmapPage() {
                                   onMouseLeave={() => setHover("")}
                                   className={clsx(
                                     "relative w-full h-8 rounded-[6px] transition-transform hover:scale-[1.08] hover:z-20",
-                                    rag === "gray" && "border border-n200",
+                                    rag === "gray" && "border border-n200 bg-n100",
                                   )}
-                                  style={{ background: rag === "gray" ? "#f8f8fb" : RAG_COLORS[rag] }}
+                                  style={rag === "gray" ? undefined : { background: RAG_COLORS[rag] }}
                                   title={`${k.name} — الربع ${q.quarter} ${q.year}`}
                                 >
                                   <span

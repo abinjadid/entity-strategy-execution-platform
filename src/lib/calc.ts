@@ -72,7 +72,7 @@ export const RAG_COLORS: Record<Rag, string> = {
 
 export const RAG_BG: Record<Rag, string> = {
   green: "bg-dga-green/12 text-dga-green-400 border-dga-green/30",
-  amber: "bg-dga-orange/12 text-[#8a5a00] border-dga-orange/35",
+  amber: "bg-dga-orange/12 text-warn-text border-dga-orange/35",
   red: "bg-dga-red/10 text-dga-red border-dga-red/30",
   gray: "bg-n100 text-n500 border-n200",
 };

@@ -228,7 +228,7 @@ export default function StrategyPage() {
                                   <Link
                                     key={k.id}
                                     href={`/kpis/${k.id}`}
-                                    className="flex items-start gap-2.5 rounded-[10px] border border-n200 bg-white p-3 hover:border-dga-navy transition-colors"
+                                    className="flex items-start gap-2.5 rounded-[10px] border border-n200 bg-surface p-3 hover:border-brand-text transition-colors"
                                   >
                                     <span className="min-w-0 flex-1">
                                       <span className="block text-[12.5px] font-bold text-ink truncate">{k.name}</span>
@@ -258,7 +258,7 @@ export default function StrategyPage() {
                                   <Link
                                     key={i.id}
                                     href={`/initiatives/${i.id}`}
-                                    className="flex flex-wrap items-center gap-3 rounded-[10px] border border-n200 bg-white p-3 hover:border-dga-navy transition-colors"
+                                    className="flex flex-wrap items-center gap-3 rounded-[10px] border border-n200 bg-surface p-3 hover:border-brand-text transition-colors"
                                   >
                                     <span className="min-w-0 flex-1">
                                       <span className="block text-[13px] font-bold text-ink">

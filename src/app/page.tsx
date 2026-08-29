@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import clsx from "clsx";
@@ -12,6 +11,7 @@ import type { Role, User } from "@/lib/types";
 import { ROLE_SUMMARY } from "@/lib/rbac";
 import { initials } from "@/lib/format";
 import { Button } from "@/components/ui";
+import { BrandMark } from "@/components/BrandMark";
 
 const ROLE_ICON: Record<Role, React.ComponentType<{ size?: number }>> = {
   admin: UserCog,
@@ -37,6 +37,7 @@ export default function LoginPage() {
   const data = useStore((s) => s.data);
   const currentUserId = useStore((s) => s.currentUserId);
   const login = useStore((s) => s.login);
+  const logo = data.settings.logoDataUrl;
 
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 0);
@@ -44,8 +45,10 @@ export default function LoginPage() {
   }, []);
 
   useEffect(() => {
-    if (ready && currentUserId) router.replace("/dashboard");
-  }, [ready, currentUserId, router]);
+    if (!ready) return;
+    if (!data.settings.onboarded) router.replace("/setup");
+    else if (currentUserId) router.replace("/dashboard");
+  }, [ready, currentUserId, data.settings.onboarded, router]);
 
   const byRole = useMemo(() => {
     const map: Record<Role, User[]> = { admin: [], pmo: [], owner: [], viewer: [] };
@@ -61,7 +64,7 @@ export default function LoginPage() {
   if (!ready) {
     return (
       <div className="min-h-dvh grid place-items-center bg-n50">
-        <div className="w-10 h-10 rounded-full border-[3px] border-n200 border-t-dga-navy animate-spin" />
+        <div className="w-10 h-10 rounded-full border-[3px] border-n200 border-t-brand-text animate-spin" />
       </div>
     );
   }
@@ -75,12 +78,10 @@ export default function LoginPage() {
       >
         <BrandLines />
         <div className="relative z-10">
-          <Image
-            src="/brand/dga-logo.png"
-            alt="الهيئة الرقمية"
-            width={190}
-            height={54}
-            className="object-contain brightness-0 invert opacity-95"
+          <BrandMark
+            variant={logo ? "mark" : "wide"}
+            size={logo ? 56 : 54}
+            className={logo ? "" : "brightness-0 invert opacity-95"}
           />
         </div>
 
@@ -114,9 +115,9 @@ export default function LoginPage() {
       </div>
 
       {/* ---------------------------------------------------- اختيار الدور */}
-      <div className="flex flex-col justify-center px-5 sm:px-10 lg:px-14 py-10 bg-white">
+      <div className="flex flex-col justify-center px-5 sm:px-10 lg:px-14 py-10 bg-surface">
         <div className="lg:hidden mb-8 flex items-center gap-3">
-          <Image src="/brand/dga-emblem.png" alt="" width={40} height={40} />
+          <BrandMark size={40} />
           <div>
             <p className="text-[15px] font-bold text-ink leading-tight">نظام إدارة استراتيجية التحول الرقمي</p>
             <p className="text-[12px] text-n500">{data.settings.entityName}</p>
@@ -141,7 +142,7 @@ export default function LoginPage() {
                 key={role}
                 className={clsx(
                   "border rounded-[14px] transition-colors",
-                  isOpen ? "border-dga-navy bg-n50" : "border-n200 hover:border-n300",
+                  isOpen ? "border-brand-text bg-n50" : "border-n200 hover:border-n300",
                 )}
               >
                 <button
@@ -175,9 +176,9 @@ export default function LoginPage() {
                       <button
                         key={u.id}
                         onClick={() => enter(u.id)}
-                        className="w-full flex items-center gap-3 rounded-[10px] border border-n200 bg-white p-3 text-start hover:border-dga-navy hover:shadow-card transition-all"
+                        className="w-full flex items-center gap-3 rounded-[10px] border border-n200 bg-surface p-3 text-start hover:border-brand-text hover:shadow-card transition-all"
                       >
-                        <span className="w-9 h-9 shrink-0 rounded-full bg-dga-navy text-white grid place-items-center text-[12px] font-bold">
+                        <span className="w-9 h-9 shrink-0 rounded-full bg-brand-solid text-white grid place-items-center text-[12px] font-bold">
                           {initials(u.name)}
                         </span>
                         <span className="min-w-0 flex-1">

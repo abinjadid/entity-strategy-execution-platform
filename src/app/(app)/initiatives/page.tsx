@@ -96,14 +96,14 @@ export default function InitiativesPage() {
             <div className="flex rounded-[10px] border border-n300 overflow-hidden">
               <button
                 onClick={() => setView("cards")}
-                className={`px-3 h-10 text-[12.5px] font-semibold flex items-center gap-1.5 ${view === "cards" ? "bg-dga-navy text-white" : "bg-white text-n700 hover:bg-n50"}`}
+                className={`px-3 h-10 text-[12.5px] font-semibold flex items-center gap-1.5 ${view === "cards" ? "bg-brand-solid text-white" : "bg-surface text-n700 hover:bg-n50"}`}
               >
                 <LayoutGrid size={15} />
                 بطاقات
               </button>
               <button
                 onClick={() => setView("table")}
-                className={`px-3 h-10 text-[12.5px] font-semibold flex items-center gap-1.5 border-s border-n300 ${view === "table" ? "bg-dga-navy text-white" : "bg-white text-n700 hover:bg-n50"}`}
+                className={`px-3 h-10 text-[12.5px] font-semibold flex items-center gap-1.5 border-s border-n300 ${view === "table" ? "bg-brand-solid text-white" : "bg-surface text-n700 hover:bg-n50"}`}
               >
                 <Rows3 size={15} />
                 جدول
@@ -160,7 +160,7 @@ export default function InitiativesPage() {
                   </div>
                   <Link href={`/initiatives/${i.id}`} className="group block">
                     <p className="text-[11.5px] text-n500 tnum">{i.code}</p>
-                    <h3 className="text-[15px] font-bold text-ink mt-1 leading-snug group-hover:text-dga-navy transition-colors">
+                    <h3 className="text-[15px] font-bold text-ink mt-1 leading-snug group-hover:text-brand-text transition-colors">
                       {i.name}
                     </h3>
                   </Link>
@@ -231,7 +231,7 @@ export default function InitiativesPage() {
                   <tr key={i.id} className="hover:bg-n50 transition-colors">
                     <Td>
                       <Link href={`/initiatives/${i.id}`} className="group">
-                        <span className="block text-[13px] font-bold text-ink group-hover:text-dga-navy transition-colors">
+                        <span className="block text-[13px] font-bold text-ink group-hover:text-brand-text transition-colors">
                           {i.name}
                         </span>
                         <span className="block text-[11.5px] text-n500 mt-0.5 tnum">{i.code}</span>

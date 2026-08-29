@@ -27,18 +27,19 @@
 }
 
 /* =========================================================================
-   DGA design tokens — Brand Identity Guideline v03 (pp. 20–25)
+   رموز التصميم — مبنية على دليل الهوية البصرية للهيئة الرقمية (v03، ص 20–25)
+   الألوان الأساسية ثابتة في الوضعين؛ الدرجات المحايدة ودرجات النص فقط تنقلب.
    ========================================================================= */
 @theme {
   --font-sans: "Diodrum Arabic", "IBM Plex Sans Arabic", "Segoe UI", system-ui, sans-serif;
 
-  /* Primary brand colors */
+  /* الألوان الأساسية الأربعة */
   --color-dga-green: #1cc182;
   --color-dga-blue: #1d9af2;
   --color-dga-navy: #2a206a;
   --color-dga-purple: #852cd0;
 
-  /* Secondary support colors */
+  /* الألوان الثانوية الداعمة */
   --color-dga-indigo: #594aff;
   --color-dga-slate: #5d6167;
   --color-dga-teal: #00abaf;
@@ -47,7 +48,7 @@
   --color-dga-orange-deep: #ff6700;
   --color-dga-red: #c40000;
 
-  /* Tint ramps */
+  /* سلالم الدرجات */
   --color-dga-green-100: #c7f9e8;
   --color-dga-green-200: #3ceebc;
   --color-dga-green-300: #00e28e;
@@ -65,7 +66,7 @@
   --color-dga-indigo-300: #523acb;
   --color-dga-indigo-400: #1c1554;
 
-  /* Neutrals */
+  /* المحايدات وأسطح الواجهة */
   --color-ink: #1a1730;
   --color-n900: #26232f;
   --color-n700: #4a4757;
@@ -74,6 +75,14 @@
   --color-n200: #e2e0e8;
   --color-n100: #f2f1f6;
   --color-n50: #f8f8fb;
+  --color-surface: #ffffff;
+
+  /* لون نص التنبيه على خلفية برتقالية فاتحة */
+  --color-warn-text: #8a5a00;
+
+  /* لون الهوية للنصوص والحدود، ولون الأسطح المصمتة — ينقلبان في الوضع الداكن */
+  --color-brand-text: #2a206a;
+  --color-brand-solid: #2a206a;
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -87,6 +96,39 @@
 :root {
   --gradient-brand: linear-gradient(180deg, #00abaf 0%, #0093b4 24%, #0080ba 48%, #774896 100%);
   --gradient-brand-h: linear-gradient(90deg, #00abaf 0%, #1d9af2 45%, #852cd0 100%);
+  --scrim: rgba(26, 23, 48, 0.45);
+  color-scheme: light;
+}
+
+/* ------------------------------- الوضع الليلي -------------------------------
+   تُقلب المحايدات وأسطح الواجهة فقط، وتُرفع درجات النص الملوّن لتبقى مقروءة
+   على الخلفيات الداكنة. الألوان الأساسية الأربعة تبقى كما هي التزاماً بالهوية.
+   -------------------------------------------------------------------------- */
+html[data-theme="dark"] {
+  --color-ink: #f0eefa;
+  --color-n900: #e2dff0;
+  --color-n700: #c3bedb;
+  --color-n500: #9a94b8;
+  --color-n300: #4a4470;
+  --color-n200: #322d55;
+  --color-n100: #272348;
+  --color-n50: #14122a;
+  --color-surface: #1e1b38;
+
+  --color-dga-green-400: #3ce6a4;
+  --color-dga-blue-400: #6bc7ff;
+  --color-dga-purple-400: #c79bf0;
+  --color-dga-red: #ff7a7a;
+  --color-warn-text: #ffc266;
+  --color-brand-text: #a99bff;
+  --color-brand-solid: #4c3fa8;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-raise: 0 4px 14px rgba(0, 0, 0, 0.45);
+  --shadow-pop: 0 14px 36px rgba(0, 0, 0, 0.55);
+
+  --scrim: rgba(6, 5, 16, 0.65);
+  color-scheme: dark;
 }
 
 html,
@@ -101,14 +143,15 @@ body {
   font-family: var(--font-sans);
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Arabic-Indic-free numerals: keep Western digits for data legibility */
+/* أرقام لاتينية بعرض ثابت لسهولة قراءة الجداول */
 .tnum {
   font-variant-numeric: tabular-nums;
 }
 
-/* Scrollbars — understated, matches the brand's calm tone */
+/* أشرطة التمرير — هادئة ومتوافقة مع الوضعين */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -128,14 +171,14 @@ body {
   border: 3px solid transparent;
 }
 
-/* Focus ring — 2px brand navy per design-system rules */
+/* حلقة التركيز — بسمك 2px بلون الهوية */
 :focus-visible {
-  outline: 2px solid var(--color-dga-navy);
+  outline: 2px solid var(--color-dga-blue);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* Range slider — used for project progress entry */
+/* شريط التمرير المستخدم في إدخال نسب الإنجاز */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -151,27 +194,28 @@ input[type="range"]::-webkit-slider-thumb {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #fff;
-  border: 3px solid var(--color-dga-navy);
+  background: var(--color-surface);
+  border: 3px solid var(--color-dga-blue);
   cursor: pointer;
-  box-shadow: 0 1px 4px rgba(26, 23, 48, 0.25);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
 }
 input[type="range"]::-moz-range-thumb {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #fff;
-  border: 3px solid var(--color-dga-navy);
+  background: var(--color-surface);
+  border: 3px solid var(--color-dga-blue);
   cursor: pointer;
 }
 
-/* Recharts is LTR-internally; keep its tooltips readable in RTL */
+/* Recharts داخلياً LTR — نُبقي التلميحات مقروءة في واجهة RTL */
 .recharts-default-tooltip {
   direction: rtl;
   text-align: right;
   border-radius: 10px !important;
+  background: var(--color-surface) !important;
   border: 1px solid var(--color-n200) !important;
-  box-shadow: 0 4px 12px rgba(26, 23, 48, 0.08);
+  box-shadow: var(--shadow-raise);
   font-family: var(--font-sans);
 }
 .recharts-wrapper,
@@ -193,12 +237,35 @@ input[type="range"]::-moz-range-thumb {
   animation: dga-fade-in 200ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
-/* ============================ Print / PDF export ========================= */
+/* ============================ الطباعة وتصدير PDF ========================= */
 @media print {
   @page {
     size: A4;
     margin: 14mm 12mm;
   }
+
+  /* الطباعة دائماً بالوضع الفاتح مهما كان وضع العرض */
+  html[data-theme="dark"],
+  html {
+    --color-ink: #1a1730;
+    --color-n900: #26232f;
+    --color-n700: #4a4757;
+    --color-n500: #767286;
+    --color-n300: #c3c1cc;
+    --color-n200: #e2e0e8;
+    --color-n100: #f2f1f6;
+    --color-n50: #ffffff;
+    --color-surface: #ffffff;
+    --color-dga-green-400: #008756;
+    --color-dga-blue-400: #005c9d;
+    --color-dga-purple-400: #531a80;
+    --color-dga-red: #c40000;
+    --color-warn-text: #8a5a00;
+    --color-brand-text: #2a206a;
+    --color-brand-solid: #2a206a;
+    color-scheme: light;
+  }
+
   html,
   body {
     background: #fff !important;

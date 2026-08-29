@@ -287,7 +287,7 @@ export default function DashboardPage() {
             />
             <Link
               href="/heatmap"
-              className="mt-5 flex items-center justify-between rounded-[10px] border border-n200 px-3.5 py-2.5 text-[12.5px] font-semibold text-dga-navy hover:bg-n50 transition-colors no-print"
+              className="mt-5 flex items-center justify-between rounded-[10px] border border-n200 px-3.5 py-2.5 text-[12.5px] font-semibold text-brand-text hover:bg-n50 transition-colors no-print"
             >
               عرض الخريطة الحرارية الكاملة
               <ArrowLeft size={15} />
@@ -334,7 +334,7 @@ export default function DashboardPage() {
             action={
               <Link
                 href="/projects"
-                className="text-[12.5px] font-semibold text-dga-navy hover:underline"
+                className="text-[12.5px] font-semibold text-brand-text hover:underline"
               >
                 كل المشاريع
               </Link>
@@ -359,7 +359,7 @@ export default function DashboardPage() {
                     <tr key={p.id} className="hover:bg-n50 transition-colors">
                       <Td>
                         <Link href={`/projects/${p.id}`} className="block group">
-                          <span className="block text-[13px] font-bold text-ink group-hover:text-dga-navy transition-colors">
+                          <span className="block text-[13px] font-bold text-ink group-hover:text-brand-text transition-colors">
                             {p.name}
                           </span>
                           <span className="block text-[11.5px] text-n500 mt-0.5 tnum">{p.code}</span>
@@ -410,7 +410,7 @@ export default function DashboardPage() {
             title="آخر التحديثات"
             subtitle="سجل الإدخالات الميدانية من ملاك المبادرات والمشاريع"
             action={
-              <Link href="/notifications" className="text-[12.5px] font-semibold text-dga-navy hover:underline">
+              <Link href="/notifications" className="text-[12.5px] font-semibold text-brand-text hover:underline">
                 الكل
               </Link>
             }

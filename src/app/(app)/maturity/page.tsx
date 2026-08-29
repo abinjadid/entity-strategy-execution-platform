@@ -142,7 +142,7 @@ export default function MaturityPage() {
           <ul className="divide-y divide-n100">
             {LEVELS.map((l) => (
               <li key={l.level} className="flex gap-3.5 px-5 py-3.5">
-                <span className="shrink-0 w-8 h-8 rounded-[9px] bg-dga-navy text-white grid place-items-center text-[13px] font-bold">
+                <span className="shrink-0 w-8 h-8 rounded-[9px] bg-brand-solid text-white grid place-items-center text-[13px] font-bold">
                   {l.level}
                 </span>
                 <span>
@@ -198,7 +198,7 @@ export default function MaturityPage() {
                   <Td className="text-[12.5px] tnum">{m.previous.toFixed(1)}</Td>
                   <Td className="text-[12.5px] tnum">{m.target.toFixed(1)}</Td>
                   <Td>
-                    <span className={`text-[12.5px] font-bold tnum ${gap > 1 ? "text-dga-red" : gap > 0.5 ? "text-[#8a5a00]" : "text-dga-green-400"}`}>
+                    <span className={`text-[12.5px] font-bold tnum ${gap > 1 ? "text-dga-red" : gap > 0.5 ? "text-warn-text" : "text-dga-green-400"}`}>
                       {gap.toFixed(1)}
                     </span>
                   </Td>

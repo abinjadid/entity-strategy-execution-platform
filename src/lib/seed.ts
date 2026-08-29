@@ -39,7 +39,9 @@ const CURRENT_YEAR = 2026;
 const CURRENT_QUARTER = 3 as const;
 
 export const SETTINGS: Settings = {
+  onboarded: false,
   entityName: "هيئة الخدمات الحكومية المشتركة",
+  logoDataUrl: "",
   strategyName: "استراتيجية التحول الرقمي 2024 – 2027",
   strategyStartYear: STRATEGY_START,
   strategyEndYear: STRATEGY_END,
@@ -1025,6 +1027,7 @@ export function buildEmptyData(): AppData {
     settings: {
       ...SETTINGS,
       entityName: "اسم الجهة",
+      logoDataUrl: "",
       strategyName: "استراتيجية التحول الرقمي",
     },
     users: USERS.slice(0, 2).map((u) => ({ ...u })),
