@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
@@ -8,6 +9,7 @@ import {
   Database,
   Download,
   FileSpreadsheet,
+  Gauge,
   Plus,
   RotateCcw,
   Save,
@@ -44,6 +46,7 @@ import { useStore } from "@/lib/store";
 import { ROLE_PERMISSIONS, ROLE_SUMMARY, can } from "@/lib/rbac";
 import type { Permission } from "@/lib/rbac";
 import { ROLE_LABELS } from "@/lib/types";
+import { activeCycle } from "@/lib/calc";
 import type { Role, User } from "@/lib/types";
 import { downloadImportTemplate, exportFullXlsx, importFromExcel } from "@/lib/excel";
 import type { ImportResult } from "@/lib/excel";
@@ -515,6 +518,24 @@ export default function AdminPage() {
                   onChange={(e) => setSettings({ ...settings, ragAmber: e.target.value })}
                 />
               </Field>
+            </div>
+            <div className="mt-6 pt-5 border-t border-n100">
+              <p className="text-[12.5px] font-bold text-ink mb-1">دورة قياس الجارية</p>
+              <p className="text-[12px] text-n500 leading-[1.85] mb-3">
+                مناظير إطار قياس تُحدَّث سنوياً بحسب دورة قياس التحول الرقمي المعلنة من هيئة الحكومة
+                الرقمية. الدورة الجارية حالياً:{" "}
+                <span className="font-bold text-ink">
+                  {activeCycle(data)?.name ?? "لا توجد دورة مسجّلة"}
+                </span>
+                {activeCycle(data)?.reference ? ` — ${activeCycle(data)?.reference}` : ""}. تُدار
+                الدورات ومناظيرها وأوزانها من شاشة «إطار قياس التحول الرقمي».
+              </p>
+              <Link href="/qiyas">
+                <Button>
+                  <Gauge size={16} />
+                  إدارة دورات قياس
+                </Button>
+              </Link>
             </div>
             <div className="mt-6 pt-5 border-t border-n100 flex flex-wrap items-center gap-3">
               <Button variant="primary" onClick={saveSettings}>

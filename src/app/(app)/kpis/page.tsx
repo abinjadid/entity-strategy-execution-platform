@@ -24,7 +24,7 @@ import {
 } from "@/components/ui";
 import { useStore } from "@/lib/store";
 import { canEnterKpi } from "@/lib/rbac";
-import { achievement, filterKpis, kpiIndex, kpiRag, latestReading } from "@/lib/calc";
+import { achievement, activePerspectives, filterKpis, kpiIndex, kpiRag, latestReading } from "@/lib/calc";
 import { kpiValue, num, pct, timeAgo } from "@/lib/format";
 import { exportKpisXlsx } from "@/lib/excel";
 import { FREQUENCY_LABELS } from "@/lib/types";
@@ -122,7 +122,7 @@ export default function KpisPage() {
             label="مناظير مغطاة"
             value={num(new Set(all.map((k) => k.perspectiveId)).size)}
             accent="#00abaf"
-            sub="من 10 مناظير في إطار قياس"
+            sub={`من ${num(activePerspectives(data).length)} مناظير في دورة القياس الجارية`}
           />
         </div>
 
@@ -180,7 +180,7 @@ export default function KpisPage() {
               {list.map(({ k, rag }) => {
                 const r = latestReading(k);
                 const a = achievement(k, r);
-                const persp = data.perspectives.find((p) => p.id === k.perspectiveId);
+                const persp = activePerspectives(data).find((p) => p.id === k.perspectiveId);
                 const may = canEnterKpi(user, k.id, data);
                 return (
                   <tr key={k.id} className="hover:bg-n50 transition-colors">

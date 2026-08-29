@@ -31,7 +31,7 @@ type StepId = 1 | 2 | 3 | 4;
 
 const STEPS: Array<{ id: StepId; title: string; hint: string; icon: React.ComponentType<{ size?: number }> }> = [
   { id: 1, title: "هوية الجهة", hint: "الاسم والشعار", icon: Building2 },
-  { id: 2, title: "الاستراتيجية", hint: "الاسم والمدى الزمني", icon: CalendarRange },
+  { id: 2, title: "الاستراتيجية ودورة قياس", hint: "المدى الزمني ودورة القياس", icon: CalendarRange },
   { id: 3, title: "حدود التقييم", hint: "نظام RAG", icon: Gauge },
   { id: 4, title: "البيانات", hint: "نقطة البداية", icon: Database },
 ];
@@ -68,6 +68,7 @@ export default function SetupPage() {
   const updateSettings = useStore((s) => s.updateSettings);
   const resetToEmpty = useStore((s) => s.resetToEmpty);
   const resetToSeed = useStore((s) => s.resetToSeed);
+  const initQiyasCycle = useStore((s) => s.initQiyasCycle);
 
   const [ready, setReady] = useState(false);
   const [step, setStep] = useState<StepId>(1);
@@ -85,6 +86,8 @@ export default function SetupPage() {
     currentQuarter: String(Math.floor(new Date().getMonth() / 3) + 1),
     ragGreen: "95",
     ragAmber: "80",
+    qiyasYear: String(thisYear),
+    qiyasReference: "",
   });
   const [dataChoice, setDataChoice] = useState<"demo" | "empty">("empty");
 
@@ -134,6 +137,12 @@ export default function SetupPage() {
     // إعادة التعيين تستبدل الإعدادات، لذا تُطبَّق هوية الجهة بعدها
     if (dataChoice === "empty") resetToEmpty();
     else resetToSeed();
+
+    // دورة قياس: تُعلن الهيئة دورة كل سنة بمناظيرها، فتبدأ الجهة الجديدة بدورة
+    // سنتها الحالية وتعدّل مناظيرها لاحقاً من شاشة إطار قياس لتطابق الدليل.
+    if (dataChoice === "empty") {
+      initQiyasCycle(Number(form.qiyasYear) || thisYear, form.qiyasReference);
+    }
 
     // مع البيانات التجريبية نُبقي الفترة الزمنية الأصلية (2024–2027) حتى تظهر
     // القراءات الربعية المرفقة بها؛ ومع الهيكل الفارغ نعتمد فترة الجهة.
@@ -353,6 +362,29 @@ export default function SetupPage() {
                       options={[1, 2, 3, 4].map((q) => ({ value: String(q), label: `الربع ${q}` }))}
                     />
                   </Field>
+
+                  <div className="sm:col-span-2 pt-2 mt-1 border-t border-n100">
+                    <p className="text-[12.5px] font-bold text-ink mb-1">دورة قياس التحول الرقمي</p>
+                    <p className="text-[12px] text-n500 leading-[1.8] mb-3">
+                      تُعلن هيئة الحكومة الرقمية دورة قياس كل سنة بمناظيرها وأوزانها المعتمدة. يبدأ
+                      النظام بدورة سنة الرصد الحالية بقائمة مناظير مبدئية، ويمكنك بعد الدخول تعديل
+                      المناظير والأوزان من شاشة «إطار قياس» لتطابق دليل الدورة، وإنشاء دورة جديدة كل
+                      سنة دون فقدان نتائج الدورات السابقة.
+                    </p>
+                  </div>
+                  <Field label="سنة دورة القياس" required>
+                    <Input
+                      type="number"
+                      value={form.qiyasYear}
+                      onChange={(e) => set("qiyasYear", e.target.value)}
+                    />
+                  </Field>
+                  <Field label="مرجع دليل الدورة" hint="اختياري — مثال: دليل قياس التحول الرقمي إصدار 2026">
+                    <Input
+                      value={form.qiyasReference}
+                      onChange={(e) => set("qiyasReference", e.target.value)}
+                    />
+                  </Field>
                 </div>
               </>
             ) : null}
@@ -471,6 +503,7 @@ export default function SetupPage() {
                       ["الاستراتيجية", form.strategyName || "—"],
                       ["المدى", `${form.strategyStartYear} – ${form.strategyEndYear}`],
                       ["الفترة الحالية", `الربع ${form.currentQuarter} · ${form.currentYear}`],
+                      ["دورة قياس", `دورة ${form.qiyasYear}`],
                       ["حدود RAG", `أخضر ≥ ${form.ragGreen}% · أصفر ≥ ${form.ragAmber}%`],
                     ].map(([k, v]) => (
                       <div key={k} className="flex items-center justify-between gap-3">

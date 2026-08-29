@@ -23,6 +23,8 @@ import {
 } from "@/components/ui";
 import { useStore } from "@/lib/store";
 import {
+  activeCycle,
+  activePerspectives,
   achievement,
   availableQuarters,
   filterInitiatives,
@@ -364,7 +366,12 @@ export default function ReportsPage() {
           </Card>
 
           <Card className="mb-5 print-border">
-            <CardHead title="تفصيل مؤشرات الأداء" subtitle="آخر قراءة معتمدة ونسبة التحقق والتقييم" />
+            <CardHead
+              title="تفصيل مؤشرات الأداء"
+              subtitle={`آخر قراءة معتمدة ونسبة التحقق والتقييم — المناظير وفق ${
+                activeCycle(data)?.name ?? "دورة القياس الجارية"
+              }`}
+            />
             <TableWrap>
               <thead>
                 <tr>
@@ -388,7 +395,7 @@ export default function ReportsPage() {
                         <span className="block text-[11.5px] text-n500 mt-0.5 tnum">{k.code}</span>
                       </Td>
                       <Td>
-                        <Chip>{data.perspectives.find((p) => p.id === k.perspectiveId)?.code}</Chip>
+                        <Chip>{activePerspectives(data).find((p) => p.id === k.perspectiveId)?.code}</Chip>
                       </Td>
                       <Td className="text-[12.5px] tnum">{kpiValue(k, k.baseline)}</Td>
                       <Td className="text-[12.5px] tnum">{kpiValue(k, r?.target ?? k.target)}</Td>

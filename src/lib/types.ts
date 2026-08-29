@@ -233,7 +233,12 @@ export interface Project {
   updates: ProgressUpdate[];
 }
 
-/** منظور من مناظير إطار قياس DGA العشرة */
+/**
+ * منظور من مناظير إطار قياس التحول الرقمي.
+ * المناظير ليست ثابتة: تُعلن هيئة الحكومة الرقمية دورة قياس كل سنة وقد تُعدّل
+ * فيها مسميات المناظير أو أوزانها أو عددها، لذلك يعيش كل منظور داخل دورة
+ * بعينها (QiyasCycle) ولا يوجد في المنصة قائمة مناظير عامة خارج الدورات.
+ */
 export interface Perspective {
   id: string;
   code: string;
@@ -244,6 +249,46 @@ export interface Perspective {
   score: number;
   previousScore: number;
   targetScore: number;
+  /** المنظور المقابل في الدورة السابقة — يُملأ تلقائياً عند النسخ */
+  carriedFromId?: string;
+  /** true إذا أُضيف هذا المنظور في هذه الدورة ولم يكن في سابقتها */
+  isNew?: boolean;
+}
+
+export type QiyasCycleStatus = "draft" | "active" | "closed";
+
+export const CYCLE_STATUS_LABELS: Record<QiyasCycleStatus, string> = {
+  draft: "مسودة",
+  active: "الدورة الجارية",
+  closed: "مغلقة",
+};
+
+/**
+ * دورة قياس سنوية.
+ * تُصدر هيئة الحكومة الرقمية دورة قياس التحول الرقمي كل سنة بمناظيرها وأوزانها
+ * المعتمدة لتلك السنة، فتُنشئ الجهة دورة جديدة في المنصة (غالباً بنسخ الدورة
+ * السابقة ثم تعديل ما تغيّر)، وتبقى الدورات المغلقة محفوظة بدرجاتها للمقارنة
+ * التاريخية دون أن تتأثر بتعديلات الدورة الجديدة.
+ */
+export interface QiyasCycle {
+  id: string;
+  /** سنة الدورة كما أعلنتها الهيئة */
+  year: number;
+  /** مسمى الدورة، مثال: دورة قياس التحول الرقمي 2026 */
+  name: string;
+  status: QiyasCycleStatus;
+  /** تاريخ إعلان الدورة من الهيئة */
+  announcedOn: string;
+  /** مرجع الدليل أو رقم الإصدار المعتمد */
+  reference: string;
+  /** أبرز ما تغيّر في هذه الدورة عن سابقتها */
+  changeNote: string;
+  /** مناظير هذه الدورة — مستقلة تماماً عن مناظير الدورات الأخرى */
+  perspectives: Perspective[];
+  /** معرّف الدورة التي نُسخت منها */
+  copiedFromId: string | null;
+  createdAt: string;
+  createdBy: string | null;
 }
 
 /** بُعد من أبعاد رادار النضج الرقمي */
@@ -304,6 +349,8 @@ export interface Settings {
   currency: string;
   ragGreen: number;
   ragAmber: number;
+  /** دورة قياس الجارية — مناظيرها هي المعتمدة في كل شاشات المنصة */
+  activeCycleId: string;
 }
 
 /** الحالة الكاملة للمنصة */
@@ -315,7 +362,7 @@ export interface AppData {
   kpis: Kpi[];
   initiatives: Initiative[];
   projects: Project[];
-  perspectives: Perspective[];
+  qiyasCycles: QiyasCycle[];
   maturity: MaturityDomain[];
   notifications: AppNotification[];
   attachments: Attachment[];

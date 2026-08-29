@@ -23,7 +23,7 @@ import {
 } from "@/components/ui";
 import { useStore } from "@/lib/store";
 import { canEnterKpi } from "@/lib/rbac";
-import { achievement, kpiRag, latestReading, qKey, ragOf } from "@/lib/calc";
+import { achievement, activePerspectives, kpiRag, latestReading, qKey, ragOf } from "@/lib/calc";
 import { dateTimeAr, kpiValue, num, pct } from "@/lib/format";
 import { FREQUENCY_LABELS, UNIT_LABELS } from "@/lib/types";
 
@@ -60,7 +60,7 @@ export default function KpiDetail() {
   const objective = data.objectives.find((o) => o.id === kpi.objectiveId);
   const pillar = data.pillars.find((p) => p.id === objective?.pillarId);
   const init = data.initiatives.find((i) => i.id === kpi.initiativeId);
-  const persp = data.perspectives.find((p) => p.id === kpi.perspectiveId);
+  const persp = activePerspectives(data).find((p) => p.id === kpi.perspectiveId);
   const owner = data.users.find((u) => u.id === kpi.ownerId);
   const last = latestReading(kpi);
   const ach = achievement(kpi, last);

@@ -12,6 +12,7 @@ import { useStore } from "@/lib/store";
 import { PRIORITY_LABELS, STATUS_LABELS } from "@/lib/types";
 import type { Filters, Priority, Status } from "@/lib/types";
 import { Select } from "@/components/ui";
+import { activePerspectives } from "@/lib/calc";
 
 export type FilterKey = keyof Filters;
 
@@ -107,7 +108,7 @@ export function FilterBar({
       value: p,
       label: PRIORITY_LABELS[p],
     })),
-    perspectiveId: data.perspectives.map((p) => ({ value: p.id, label: `${p.code} · ${p.name}` })),
+    perspectiveId: activePerspectives(data).map((p) => ({ value: p.id, label: `${p.code} · ${p.name}` })),
   };
 
   const onChange = (k: FilterKey, v: string) => {

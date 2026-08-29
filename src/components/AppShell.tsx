@@ -47,7 +47,7 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
       { href: "/dashboard", label: "لوحة القيادة", icon: LayoutDashboard },
       { href: "/heatmap", label: "الخريطة الحرارية", icon: Grid3x3 },
       { href: "/maturity", label: "رادار النضج الرقمي", icon: Radar },
-      { href: "/qiyas", label: "إطار قياس — 10 مناظير", icon: Gauge },
+      { href: "/qiyas", label: "إطار قياس التحول الرقمي", icon: Gauge },
     ],
   },
   {

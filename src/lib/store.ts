@@ -10,7 +10,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-import { buildEmptyData, buildSeedData } from "./seed";
+import { buildEmptyData, buildSeedData, emptyCycle } from "./seed";
 import { uid } from "./format";
 import type {
   AppData,
@@ -24,7 +24,9 @@ import type {
   NotificationKind,
   Objective,
   Pillar,
+  Perspective,
   Project,
+  QiyasCycle,
   Role,
   Settings,
   Status,
@@ -87,7 +89,32 @@ interface State {
   removeUser: (id: string) => void;
   updateSettings: (patch: Partial<Settings>) => void;
   updateMaturity: (id: string, patch: { current?: number; target?: number }) => void;
-  updatePerspective: (id: string, patch: Partial<{ score: number; targetScore: number; weight: number; name: string }>) => void;
+  updatePerspective: (
+    id: string,
+    patch: Partial<Pick<Perspective, "score" | "targetScore" | "weight" | "name" | "code" | "description">>,
+    cycleId?: string,
+  ) => void;
+
+  // ------- دورات قياس السنوية
+  createCycle: (input: {
+    year: number;
+    name?: string;
+    announcedOn?: string;
+    reference?: string;
+    changeNote?: string;
+    copyFromId?: string | null;
+  }) => string;
+  updateCycle: (
+    id: string,
+    patch: Partial<Pick<QiyasCycle, "year" | "name" | "announcedOn" | "reference" | "changeNote">>,
+  ) => void;
+  activateCycle: (id: string) => void;
+  removeCycle: (id: string) => void;
+  addPerspective: (cycleId: string, p?: Partial<Perspective>) => void;
+  removePerspective: (cycleId: string, perspectiveId: string) => void;
+  relinkKpiPerspective: (kpiId: string, perspectiveId: string) => void;
+  /** يهيّئ دورة قياس واحدة لجهة جديدة (يُستدعى من معالج الإعداد الأول) */
+  initQiyasCycle: (year: number, reference?: string) => void;
 
   // ------- الإشعارات
   markNotificationRead: (id: string) => void;
@@ -478,7 +505,11 @@ export const useStore = create<State>()(
             description: k.description ?? "",
             objectiveId: k.objectiveId ?? s.data.objectives[0]?.id ?? "",
             initiativeId: k.initiativeId ?? null,
-            perspectiveId: k.perspectiveId ?? s.data.perspectives[0]?.id ?? "",
+            perspectiveId:
+              k.perspectiveId ??
+              s.data.qiyasCycles.find((c) => c.id === s.data.settings.activeCycleId)?.perspectives[0]
+                ?.id ??
+              "",
             unit: k.unit ?? "percent",
             direction: k.direction ?? "increase",
             baseline: k.baseline ?? 0,
@@ -535,11 +566,180 @@ export const useStore = create<State>()(
           },
         })),
 
-      updatePerspective: (id, patch) =>
+      updatePerspective: (id, patch, cycleId) =>
+        set((s) => {
+          const target = cycleId ?? s.data.settings.activeCycleId;
+          return {
+            data: {
+              ...s.data,
+              qiyasCycles: s.data.qiyasCycles.map((c) =>
+                c.id !== target
+                  ? c
+                  : { ...c, perspectives: c.perspectives.map((p) => (p.id === id ? { ...p, ...patch } : p)) },
+              ),
+            },
+          };
+        }),
+
+      // -------------------------------------------------- دورات قياس السنوية
+      // تُعلن هيئة الحكومة الرقمية دورة قياس كل سنة، فتنشئ الجهة دورة جديدة
+      // هنا — غالباً بنسخ الدورة السابقة ثم تعديل ما تغيّر من مسميات وأوزان.
+      createCycle: (input) => {
+        const id = `cycle-${uid()}`;
+        set((s) => {
+          const src = input.copyFromId
+            ? s.data.qiyasCycles.find((c) => c.id === input.copyFromId)
+            : undefined;
+          const perspectives: Perspective[] = src
+            ? src.perspectives.map((p) => ({
+                ...p,
+                id: `${p.id}__${input.year}`,
+                // درجة الدورة السابقة تصبح «القياس السابق» في الدورة الجديدة
+                previousScore: p.score,
+                score: 0,
+                carriedFromId: p.id,
+                isNew: false,
+              }))
+            : emptyCycle(input.year, s.currentUserId).perspectives;
+
+          const cycle: QiyasCycle = {
+            id,
+            year: input.year,
+            name: input.name?.trim() || `دورة قياس التحول الرقمي ${input.year}`,
+            status: "draft",
+            announcedOn: input.announcedOn ?? "",
+            reference: input.reference ?? "",
+            changeNote: input.changeNote ?? "",
+            perspectives,
+            copiedFromId: src?.id ?? null,
+            createdAt: new Date().toISOString(),
+            createdBy: s.currentUserId,
+          };
+          return {
+            data: {
+              ...s.data,
+              qiyasCycles: [...s.data.qiyasCycles, cycle].sort((a, b) => a.year - b.year),
+            },
+          };
+        });
+        return id;
+      },
+
+      updateCycle: (id, patch) =>
         set((s) => ({
           data: {
             ...s.data,
-            perspectives: s.data.perspectives.map((p) => (p.id === id ? { ...p, ...patch } : p)),
+            qiyasCycles: s.data.qiyasCycles.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+          },
+        })),
+
+      /**
+       * اعتماد دورة: تصبح هي المرجع في كل الشاشات، وتُغلق الدورة الجارية سابقاً
+       * فتبقى محفوظة بدرجاتها للمقارنة. تُعاد أيضاً محاولة ربط المؤشرات تلقائياً
+       * بالمنظور المقابل في الدورة الجديدة اعتماداً على سلسلة النسخ.
+       */
+      activateCycle: (id) =>
+        set((s) => {
+          const next = s.data.qiyasCycles.find((c) => c.id === id);
+          if (!next) return {};
+          const mapByOrigin = new Map<string, string>();
+          next.perspectives.forEach((p) => {
+            if (p.carriedFromId) mapByOrigin.set(p.carriedFromId, p.id);
+          });
+          const byCode = new Map(next.perspectives.map((p) => [p.code, p.id]));
+          const prevPersp = new Map(
+            s.data.qiyasCycles
+              .find((c) => c.id === s.data.settings.activeCycleId)
+              ?.perspectives.map((p) => [p.id, p]) ?? [],
+          );
+
+          return {
+            data: {
+              ...s.data,
+              settings: { ...s.data.settings, activeCycleId: id },
+              qiyasCycles: s.data.qiyasCycles.map((c) =>
+                c.id === id
+                  ? { ...c, status: "active" as const }
+                  : c.status === "active"
+                    ? { ...c, status: "closed" as const }
+                    : c,
+              ),
+              kpis: s.data.kpis.map((k) => {
+                if (!k.perspectiveId) return k;
+                const direct = mapByOrigin.get(k.perspectiveId);
+                if (direct) return { ...k, perspectiveId: direct };
+                const code = prevPersp.get(k.perspectiveId)?.code;
+                const byCodeId = code ? byCode.get(code) : undefined;
+                return byCodeId ? { ...k, perspectiveId: byCodeId } : k;
+              }),
+            },
+          };
+        }),
+
+      removeCycle: (id) =>
+        set((s) =>
+          s.data.settings.activeCycleId === id || s.data.qiyasCycles.length <= 1
+            ? {}
+            : { data: { ...s.data, qiyasCycles: s.data.qiyasCycles.filter((c) => c.id !== id) } },
+        ),
+
+      addPerspective: (cycleId, p) =>
+        set((s) => ({
+          data: {
+            ...s.data,
+            qiyasCycles: s.data.qiyasCycles.map((c) => {
+              if (c.id !== cycleId) return c;
+              const n = c.perspectives.length + 1;
+              return {
+                ...c,
+                perspectives: [
+                  ...c.perspectives,
+                  {
+                    id: `p-${uid()}`,
+                    code: p?.code || `M${n}`,
+                    name: p?.name || `منظور جديد ${n}`,
+                    description: p?.description || "",
+                    weight: p?.weight ?? 0,
+                    score: p?.score ?? 0,
+                    previousScore: 0,
+                    targetScore: p?.targetScore ?? 100,
+                    isNew: true,
+                  },
+                ],
+              };
+            }),
+          },
+        })),
+
+      removePerspective: (cycleId, perspectiveId) =>
+        set((s) => ({
+          data: {
+            ...s.data,
+            qiyasCycles: s.data.qiyasCycles.map((c) =>
+              c.id === cycleId
+                ? { ...c, perspectives: c.perspectives.filter((p) => p.id !== perspectiveId) }
+                : c,
+            ),
+          },
+        })),
+
+      initQiyasCycle: (year, reference) =>
+        set((s) => {
+          const c = emptyCycle(year, s.currentUserId);
+          return {
+            data: {
+              ...s.data,
+              qiyasCycles: [{ ...c, reference: reference?.trim() ?? "" }],
+              settings: { ...s.data.settings, activeCycleId: c.id },
+            },
+          };
+        }),
+
+      relinkKpiPerspective: (kpiId, perspectiveId) =>
+        set((s) => ({
+          data: {
+            ...s.data,
+            kpis: s.data.kpis.map((k) => (k.id === kpiId ? { ...k, perspectiveId } : k)),
           },
         })),
 
@@ -626,7 +826,38 @@ export const useStore = create<State>()(
       onRehydrateStorage: () => (state) => {
         if (state) state.hydrated = true;
       },
-      version: 1,
+      version: 2,
+      /**
+       * ترحيل النسخة 1 → 2: كانت المناظير قائمة عامة واحدة، وأصبحت تعيش داخل
+       * دورات قياس سنوية. تُلَف قائمة المناظير القديمة في دورة واحدة تحمل السنة
+       * الحالية وتُعتمد كدورة جارية، فتُحفظ درجات الجهة كما هي دون فقد.
+       */
+      migrate: (persisted, version) => {
+        const st = persisted as { data?: Record<string, unknown> } | undefined;
+        if (!st?.data || version >= 2) return persisted;
+        const d = st.data as Record<string, unknown>;
+        if (Array.isArray(d.qiyasCycles) && d.qiyasCycles.length) return persisted;
+        const legacy = Array.isArray(d.perspectives) ? (d.perspectives as Perspective[]) : [];
+        const settings = (d.settings ?? {}) as Settings;
+        const year = settings.currentYear || new Date().getFullYear();
+        const cycle: QiyasCycle = {
+          id: `cycle-${year}`,
+          year,
+          name: `دورة قياس التحول الرقمي ${year}`,
+          status: "active",
+          announcedOn: "",
+          reference: "",
+          changeNote: "نُقلت المناظير المسجّلة سابقاً إلى دورة قياس بهذه السنة.",
+          perspectives: legacy.length ? legacy : emptyCycle(year).perspectives,
+          copiedFromId: null,
+          createdAt: new Date().toISOString(),
+          createdBy: null,
+        };
+        delete d.perspectives;
+        d.qiyasCycles = [cycle];
+        d.settings = { ...settings, activeCycleId: cycle.id };
+        return persisted;
+      },
     },
   ),
 );

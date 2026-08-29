@@ -9,6 +9,7 @@
 import type { Workbook, Worksheet } from "exceljs";
 
 import {
+  activePerspectives,
   achievement,
   initiativeProgress,
   kpiRag,
@@ -273,7 +274,7 @@ function addKpisSheet(wb: Workbook, data: AppData, list = data.kpis) {
       name: k.name,
       objective: data.objectives.find((o) => o.id === k.objectiveId)?.name ?? "",
       init: data.initiatives.find((i) => i.id === k.initiativeId)?.code ?? "",
-      perspective: data.perspectives.find((p) => p.id === k.perspectiveId)?.name ?? "",
+      perspective: activePerspectives(data).find((p) => p.id === k.perspectiveId)?.name ?? "",
       unit: UNIT_LABELS[k.unit],
       direction: k.direction === "increase" ? "تصاعدي" : "تنازلي",
       baseline: k.baseline,
@@ -631,7 +632,7 @@ export async function importFromExcel(file: File, existing: AppData): Promise<Im
   const pillarIdByCode = new Map(existing.pillars.map((p) => [p.code, p.id]));
   const objIdByCode = new Map(existing.objectives.map((o) => [o.code, o.id]));
   const initIdByCode = new Map(existing.initiatives.map((i) => [i.code, i.id]));
-  const perspIdByCode = new Map(existing.perspectives.map((p) => [p.code, p.id]));
+  const perspIdByCode = new Map(activePerspectives(existing).map((p) => [p.code, p.id]));
   const userIdByEmail = new Map(existing.users.map((u) => [u.email.toLowerCase(), u.id]));
 
   // ----- الركائز
@@ -786,7 +787,7 @@ export async function importFromExcel(file: File, existing: AppData): Promise<Im
         objectiveId,
         initiativeId: initIdByCode.get(cell(wsK, r, h["initiativeCode"])) ?? null,
         perspectiveId:
-          perspIdByCode.get(cell(wsK, r, h["perspectiveCode"])) ?? existing.perspectives[0]?.id ?? "q1",
+          perspIdByCode.get(cell(wsK, r, h["perspectiveCode"])) ?? activePerspectives(existing)[0]?.id ?? "",
         unit: (cell(wsK, r, h["unit"]) || "percent") as AppData["kpis"][number]["unit"],
         direction: (cell(wsK, r, h["direction"]) || "increase") as "increase" | "decrease",
         baseline: Number(cell(wsK, r, h["baseline"])) || 0,

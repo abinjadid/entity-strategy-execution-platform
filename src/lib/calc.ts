@@ -8,8 +8,10 @@ import type {
   Initiative,
   Kpi,
   KpiReading,
+  Perspective,
   Pillar,
   Project,
+  QiyasCycle,
   Rag,
 } from "./types";
 
@@ -341,4 +343,65 @@ export function availableQuarters(data: AppData): Array<{ year: number; quarter:
     }
   }
   return out;
+}
+
+// ------------------------------------------------- دورات قياس والمناظير
+
+/**
+ * الدورة الجارية.
+ * تُعلن هيئة الحكومة الرقمية دورة قياس جديدة كل سنة، ولذلك لا تقرأ أي شاشة
+ * المناظير من قائمة عامة، بل من الدورة الجارية عبر هذه الدالة. عند اعتماد دورة
+ * جديدة تنقلب كل الشاشات إلى مناظيرها تلقائياً وتبقى الدورات السابقة محفوظة.
+ */
+export function activeCycle(data: AppData): QiyasCycle | null {
+  const byId = data.qiyasCycles.find((c) => c.id === data.settings.activeCycleId);
+  if (byId) return byId;
+  return (
+    data.qiyasCycles.find((c) => c.status === "active") ??
+    data.qiyasCycles.slice().sort((a, b) => b.year - a.year)[0] ??
+    null
+  );
+}
+
+/** مناظير الدورة الجارية — المرجع الوحيد للمناظير في كل الشاشات */
+export function activePerspectives(data: AppData): Perspective[] {
+  return activeCycle(data)?.perspectives ?? [];
+}
+
+/** الدورة المغلقة الأحدث قبل دورة معيّنة — للمقارنة التاريخية */
+export function previousCycle(data: AppData, cycle: QiyasCycle | null): QiyasCycle | null {
+  if (!cycle) return null;
+  if (cycle.copiedFromId) {
+    const src = data.qiyasCycles.find((c) => c.id === cycle.copiedFromId);
+    if (src) return src;
+  }
+  return (
+    data.qiyasCycles
+      .filter((c) => c.id !== cycle.id && c.year < cycle.year)
+      .sort((a, b) => b.year - a.year)[0] ?? null
+  );
+}
+
+/** الدرجة الإجمالية لدورة = متوسط درجات مناظيرها مرجّحاً بالأوزان */
+export function cycleScore(
+  cycle: QiyasCycle | null,
+  field: "score" | "previousScore" | "targetScore" = "score",
+): number {
+  if (!cycle || !cycle.perspectives.length) return 0;
+  const w = cycle.perspectives.reduce((s, p) => s + p.weight, 0);
+  if (!w) return 0;
+  return cycle.perspectives.reduce((s, p) => s + p[field] * p.weight, 0) / w;
+}
+
+/** مجموع أوزان مناظير الدورة — يجب أن يساوي 100 قبل اعتمادها */
+export const cycleWeightTotal = (cycle: QiyasCycle | null) =>
+  cycle ? cycle.perspectives.reduce((s, p) => s + p.weight, 0) : 0;
+
+/**
+ * المؤشرات التي كانت مرتبطة بمنظور لم يعد موجوداً في الدورة الجارية.
+ * تظهر للمستخدم كتنبيه لإعادة الربط بعد اعتماد دورة قياس جديدة.
+ */
+export function orphanKpis(data: AppData): Kpi[] {
+  const ids = new Set(activePerspectives(data).map((p) => p.id));
+  return data.kpis.filter((k) => k.perspectiveId && !ids.has(k.perspectiveId));
 }

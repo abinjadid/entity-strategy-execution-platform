@@ -18,7 +18,15 @@ import {
   StatCard,
 } from "@/components/ui";
 import { useStore } from "@/lib/store";
-import { RAG_COLORS, achievement, availableQuarters, filterKpis, ragOf, readingAt } from "@/lib/calc";
+import {
+  RAG_COLORS,
+  achievement,
+  activePerspectives,
+  availableQuarters,
+  filterKpis,
+  ragOf,
+  readingAt,
+} from "@/lib/calc";
 import { kpiValue, num, pct } from "@/lib/format";
 import { exportKpisXlsx } from "@/lib/excel";
 import type { Rag } from "@/lib/types";
@@ -59,7 +67,7 @@ export default function HeatmapPage() {
         label = p ? `${p.code} · ${p.name}` : "بدون ركيزة";
         color = p?.color;
       } else if (groupBy === "perspective") {
-        const p = data.perspectives.find((x) => x.id === k.perspectiveId);
+        const p = activePerspectives(data).find((x) => x.id === k.perspectiveId);
         key = p?.id ?? "none";
         label = p ? `${p.code} · ${p.name}` : "بدون منظور";
       } else if (groupBy === "initiative") {

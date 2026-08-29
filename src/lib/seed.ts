@@ -13,6 +13,7 @@ import type {
   Milestone,
   Objective,
   Perspective,
+  QiyasCycle,
   Pillar,
   Priority,
   Project,
@@ -50,6 +51,7 @@ export const SETTINGS: Settings = {
   currency: "ريال",
   ragGreen: 95,
   ragAmber: 80,
+  activeCycleId: "cycle-2026",
 };
 
 // ------------------------------------------------------------- المستخدمون
@@ -353,7 +355,10 @@ const OBJECTIVES: Objective[] = [
 
 // -------------------------------------------------- مناظير إطار قياس DGA
 
-const PERSPECTIVES: Perspective[] = [
+// مناظير دورة قياس 2026 (الدورة الجارية في البيانات التجريبية).
+// أعيد فيها توزيع وزنين وتحديث مسمى منظور واحد عمّا كان في دورة 2025،
+// وهي الحالة الطبيعية: تُحدَّث المناظير سنوياً بحسب ما تعلنه الهيئة.
+const PERSPECTIVES_2026: Perspective[] = [
   {
     id: "q1",
     code: "M1",
@@ -379,7 +384,7 @@ const PERSPECTIVES: Perspective[] = [
     code: "M3",
     name: "البنية التحتية الرقمية",
     description: "جاهزية البنية التحتية والسحابة والشبكات وقدرتها على دعم الخدمات الرقمية.",
-    weight: 10,
+    weight: 8,
     score: 72,
     previousScore: 58,
     targetScore: 90,
@@ -417,9 +422,9 @@ const PERSPECTIVES: Perspective[] = [
   {
     id: "q7",
     code: "M7",
-    name: "الذكاء الاصطناعي والتقنيات الناشئة",
+    name: "التقنيات الناشئة والذكاء الاصطناعي التوليدي",
     description: "تبني الذكاء الاصطناعي والتقنيات الناشئة في العمليات والخدمات.",
-    weight: 8,
+    weight: 10,
     score: 58,
     previousScore: 38,
     targetScore: 82,
@@ -455,6 +460,93 @@ const PERSPECTIVES: Perspective[] = [
     targetScore: 84,
   },
 ];
+
+/** فروق دورة 2025 عن 2026 — تُستخدم لبناء الدورة المغلقة كما كانت فعلاً */
+const CYCLE_2025_OVERRIDES: Record<string, Partial<Perspective>> = {
+  q3: { weight: 10 },
+  q7: { weight: 8, name: "الذكاء الاصطناعي والتقنيات الناشئة" },
+};
+
+/** نتيجة دورة 2024 لكل منظور — تصبح «القياس السابق» في دورة 2025 */
+const SCORES_2024: Record<string, number> = {
+  q1: 58, q2: 52, q3: 47, q4: 55, q5: 49,
+  q6: 40, q7: 26, q8: 61, q9: 37, q10: 33,
+};
+
+function buildCycles(): QiyasCycle[] {
+  // دورة 2025 — مغلقة، محفوظة بدرجاتها كما اعتُمدت في حينها
+  const p2025: Perspective[] = PERSPECTIVES_2026.map((p) => ({
+    ...p,
+    id: `${p.id}-2025`,
+    score: p.previousScore,
+    previousScore: SCORES_2024[p.id] ?? 0,
+    targetScore: Math.max(p.previousScore, p.targetScore - 6),
+    ...CYCLE_2025_OVERRIDES[p.id],
+  }));
+
+  // دورة 2026 — الجارية، نُسخت من 2025 ثم عُدّلت بحسب ما أعلنته الهيئة
+  const p2026: Perspective[] = PERSPECTIVES_2026.map((p) => ({
+    ...p,
+    carriedFromId: `${p.id}-2025`,
+  }));
+
+  return [
+    {
+      id: "cycle-2025",
+      year: 2025,
+      name: "دورة قياس التحول الرقمي 2025",
+      status: "closed",
+      announcedOn: "2025-02-10",
+      reference: "دليل قياس التحول الرقمي — إصدار 2025",
+      changeNote: "الدورة المرجعية التي بُني عليها القياس الأول للجهة.",
+      perspectives: p2025,
+      copiedFromId: null,
+      createdAt: "2025-02-18T08:00:00.000Z",
+      createdBy: "u1",
+    },
+    {
+      id: "cycle-2026",
+      year: 2026,
+      name: "دورة قياس التحول الرقمي 2026",
+      status: "active",
+      announcedOn: "2026-01-27",
+      reference: "دليل قياس التحول الرقمي — إصدار 2026",
+      changeNote:
+        "رُفع وزن منظور التقنيات الناشئة من 8% إلى 10% وخُفض وزن البنية التحتية من 10% إلى 8%، وحُدِّث مسمى المنظور السابع ليشمل الذكاء الاصطناعي التوليدي.",
+      perspectives: p2026,
+      copiedFromId: "cycle-2025",
+      createdAt: "2026-02-02T07:30:00.000Z",
+      createdBy: "u1",
+    },
+  ];
+}
+
+/**
+ * دورة قياس ابتدائية لجهة جديدة.
+ * المناظير هنا نقطة انطلاق مبنية على الفهم العام لإطار القياس، والمفترض أن
+ * تعدّلها الجهة لتطابق دليل دورة قياس السنة المعلن من الهيئة.
+ */
+export function emptyCycle(year: number, createdBy: string | null = null): QiyasCycle {
+  return {
+    id: `cycle-${year}`,
+    year,
+    name: `دورة قياس التحول الرقمي ${year}`,
+    status: "active",
+    announcedOn: "",
+    reference: "",
+    changeNote: "",
+    perspectives: PERSPECTIVES_2026.map((p) => ({
+      ...p,
+      id: `${p.id}-${year}`,
+      score: 0,
+      previousScore: 0,
+      carriedFromId: undefined,
+    })),
+    copiedFromId: null,
+    createdAt: new Date().toISOString(),
+    createdBy,
+  };
+}
 
 // ------------------------------------------------------ رادار النضج الرقمي
 
@@ -1015,7 +1107,7 @@ export function buildSeedData(): AppData {
       milestones: p.milestones.map((m) => ({ ...m })),
       updates: p.updates.map((u) => ({ ...u })),
     })),
-    perspectives: PERSPECTIVES.map((p) => ({ ...p })),
+    qiyasCycles: buildCycles(),
     maturity: MATURITY.map((m) => ({ ...m })),
     notifications: NOTIFICATIONS.map((n) => ({ ...n })),
     attachments: [],
@@ -1029,6 +1121,7 @@ export function buildEmptyData(): AppData {
       entityName: "اسم الجهة",
       logoDataUrl: "",
       strategyName: "استراتيجية التحول الرقمي",
+      activeCycleId: `cycle-${SETTINGS.currentYear}`,
     },
     users: USERS.slice(0, 2).map((u) => ({ ...u })),
     pillars: [],
@@ -1036,7 +1129,7 @@ export function buildEmptyData(): AppData {
     kpis: [],
     initiatives: [],
     projects: [],
-    perspectives: PERSPECTIVES.map((p) => ({ ...p, score: 0, previousScore: 0 })),
+    qiyasCycles: [emptyCycle(SETTINGS.currentYear)],
     maturity: MATURITY.map((m) => ({ ...m, current: 0, previous: 0 })),
     notifications: [],
     attachments: [],
